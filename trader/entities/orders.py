@@ -1,3 +1,5 @@
+from entities.zerodha import LiveTicker
+from kiteconnect import KiteConnect
 from typing import Dict, Iterator
 from entities.trade import Trade
 from enum import Enum
@@ -49,14 +51,20 @@ class OrderExecutor:
         for trading_symbol in self.entries:
             yield self.entries[trading_symbol]
 
-    def enter_trade(self, trade: Trade):
-        self.enter_order(trade)
+    def enter_trade(self, trade: Trade, kite: KiteConnect, quote: LiveTicker):
+        try:
+            trade.entry_price = quote.last_price
+            trade.place_order(kite)
+        except Exception as e:
+            raise Exception(f"failed to place order {e}")
+        else:
+            self.enter_order(trade)
 
-        # publish the trade to the publisher
-        # class to execute the trade
-
-    def exit_trade(self, trade: Trade):
-        self.clean_order(trade.trading_symbol)
-
-        # execute the trade here
-        # class to execute the trade
+    def exit_trade(self, trade: Trade, kite: KiteConnect, quote: LiveTicker):
+        try:
+            trade.entry_price = quote.last_price
+            trade.place_order(kite)
+        except Exception as e:
+            raise Exception(f"failed to place order {e}")
+        else:
+            self.clean_order(trade.trading_symbol)

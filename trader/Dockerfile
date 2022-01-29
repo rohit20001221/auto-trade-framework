@@ -4,8 +4,6 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update
 
-RUN apt-get install -y netcat
-
 RUN apt-get install -y wget tar gcc build-essential
 
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz

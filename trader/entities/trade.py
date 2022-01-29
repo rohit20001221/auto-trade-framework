@@ -1,68 +1,60 @@
-from enum import Enum
 import json
-
-
-class TradeType(Enum):
-    INDEXOPT = "INDEXOPT"
-    INDEXFUT = "INDEXFUT"
-    STOCKOPT = "STOCKOPT"
-    STOCK = "STOCK"
-    STOCKFUT = "STOCKFUT"
-
-
-class TradeTag(Enum):
-    ENTRY = "ENTRY"
-    EXIT = "EXIT"
-
-
-class TradeEndpoint(Enum):
-    MARKET_ORDER_BUY = "/place/market_order/buy"
-    MARKET_ORDER_SELL = "/place/market_order/sell"
-    LIMIT_ORDER_BUY = "/place/limit_order/buy"
-    LIMIT_ORDER_SELL = "/place/limit_order/sell"
+from kiteconnect import KiteConnect
 
 
 class Trade:
+    LIMIT_ORDER = KiteConnect.ORDER_TYPE_LIMIT
+    MARKET_ORDER = KiteConnect.ORDER_TYPE_MARKET
+
+    EXCHANGE_NSE = KiteConnect.EXCHANGE_NSE
+    EXCHANGE_NFO = KiteConnect.EXCHANGE_NFO
+
+    BUY = KiteConnect.TRANSACTION_TYPE_BUY
+    SELL = KiteConnect.TRANSACTION_TYPE_SELL
+
     def __init__(
         self,
-        endpoint: TradeEndpoint,
         trading_symbol: str,
         exchange: str,
+        order_type: str,
+        transaction_type: str,
         quantity: int,
-        tag: TradeTag,
-        publisher: str,
-        entry_price: int,
-        price: int,
-        ltp: int,
-        type: TradeType,
-        max_quantity: float = float("inf"),
+        entry_price: int = None,
+        price: int = None,
     ):
-        self.endpoint: TradeEndpoint = endpoint
         self.trading_symbol: str = trading_symbol
         self.exchange: str = exchange
         self.quantity: int = quantity
-        self.tag: TradeTag = tag
-        self.publisher: str = publisher
         self.entry_price: int = entry_price
         self.price: int = price
-        self.ltp: int = ltp
-        self.type: TradeType = type
-        self.max_quantity = max_quantity
+        self.order_type = order_type
+        self.transaction_type = transaction_type
+
+    def place_order(self, kite: KiteConnect):
+        if self.order_type == self.LIMIT_ORDER and self.price == None:
+            raise Exception("provide a price to execute limit order")
+
+        order = kite.place_order(
+            KiteConnect.VARIETY_REGULAR,
+            self.exchange,
+            self.trading_symbol,
+            self.transaction_type,
+            self.quantity,
+            KiteConnect.PRODUCT_NRML,
+            self.order_type,
+            price=self.price if self.order_type == self.LIMIT_ORDER else None,
+        )
+
+        return order
 
     def json(self):
         return json.dumps(
             {
-                "endpoint": self.endpoint.value,
                 "trading_symbol": self.trading_symbol,
                 "exchange": self.exchange,
                 "quantity": self.quantity,
-                "tag": self.tag.value,
-                "publisher": self.publisher,
                 "entry_price": self.entry_price,
                 "price": self.price,
-                "ltp": self.ltp,
-                "type": self.type.value,
-                "max_quantity": self.max_quantity,
             },
             indent=1,
         )
