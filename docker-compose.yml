@@ -1,0 +1,29 @@
+version: "3.3"
+
+services:
+  redis_server:
+    image: redis:alpine
+    logging:
+      driver: none
+
+  live_data:
+    build: ./live
+    volumes:
+      - ./live:/app
+    command: ["python", "app.py"]
+    env_file:
+      - .env
+    depends_on:
+      - redis_server
+    restart: always
+
+  trader:
+    build: ./trader
+    volumes:
+      - ./trader:/app
+    command: ["python", "init.py"]
+    env_file:
+      - .env
+    depends_on:
+      - live_data
+    restart: always

@@ -1,0 +1,13 @@
+dnspython
+pika
+requests
+pymongo
+websocket-client
+flask
+redis
+pandas
+nsetools
+kiteconnect
+statsmodels
+pandas
+pytest
