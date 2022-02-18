@@ -54,11 +54,8 @@ class TradeBot(OrderExecutor):
 
     def _exit_strategy(self, interval=10):
         while True:
-            tickers = set(self.entries.keys()).copy()
-
-            for ticker in tickers:
-                if ticker in self.entries:
-                    self.exit_strategy(self.entries[ticker])
+            for order in self.get_orders():
+                self.exit_strategy(order)
 
             time.sleep(interval)
 
