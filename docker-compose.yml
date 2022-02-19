@@ -6,6 +6,16 @@ services:
     logging:
       driver: none
 
+  db:
+    image: mongo
+    ports:
+      - "27018:27017"
+    command: mongod
+    volumes:
+      - ./db:/data/db
+    logging:
+      driver: none
+
   live_data:
     build: ./live
     volumes:

@@ -109,12 +109,26 @@ class ZerodhaKite:
         end_time: datetime.datetime,
         interval: HistoricalDataInterval,
     ) -> List[HistoricalOHLC]:
-        _data = self.kite.historical_data(
-            self.token_map[tradingsymbol]["instrument_token"],
-            start_time,
-            end_time,
-            interval.value,
-        )
+        # check for the data in cache
+        if self.redis.get(f"historical:{tradingsymbol}"):
+            # if there is a cache hit get the historical data from cache
+            _data = json.loads(
+                self.redis.get(f"historical:{interval.value}:{tradingsymbol}")
+            )
+        else:
+            _data = self.kite.historical_data(
+                self.token_map[tradingsymbol]["instrument_token"],
+                start_time,
+                end_time,
+                interval.value,
+            )
+
+            # add the historical data to cache
+            self.redis.set(
+                f"historical:{interval.value}:{tradingsymbol}",
+                json.dumps(_data, default=str),
+                self.get_expiry(interval.value),
+            )
 
         data: List[HistoricalOHLC] = []
         for ohlc in _data:
