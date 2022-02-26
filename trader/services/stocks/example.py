@@ -11,7 +11,7 @@ class Example(TradeBot):
         while True:
             for ticker in self.tickers:
                 trade = Trade(
-                    ticker, Trade.EXCHANGE_NSE, Trade.LIMIT_ORDER, Trade.BUY, 1, 0, 0
+                    ticker, Trade.EXCHANGE_NSE, Trade.LIMIT_ORDER, Trade.BUY, 1, 15, 15
                 )
 
                 try:

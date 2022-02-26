@@ -22,13 +22,13 @@ class TradeBot(OrderExecutor):
         name: str,
         mode: OrderExecutorType = OrderExecutorType.MULTIPLE,
     ):
-        super().__init__(mode=mode)
         self.name = name
-
         self.kite = KiteConnect(
             api_key=os.environ["API_KEY"], access_token=os.environ["ACCESS_TOKEN"]
         )
         self.zerodha = ZerodhaKite(self.kite)
+
+        super().__init__(mode=mode)
 
     def enter_trade(self, trade: Trade):
         try:
